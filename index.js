@@ -9,6 +9,7 @@ const CINEMA_INFO = '1'
 const SHOW_LIST = '2'
 const FILM_INFO = '3'
 const SHOW_TIMES = '4'
+const INDEX = '5'
 
 // emoji
 const CINEMA = '🏤'
@@ -24,19 +25,32 @@ const pc = require('./process-centric/process_cinemas.js')
 const pf = require('./process-centric/process_film.js')
 
 // start
+const startMsg = '<b>Welcome to CinemasBot</b>\nClick on the button below to get coords and search the cinema nearby'
+const startKeyboard = [[{
+  text: CINEMA + ' Cinema List',
+  callback_data: CINEMA_LIST
+}]]
+
 bot.onText(/\/start/, (msg) => {
   // removeKeyboard(msg)
-  bot.sendMessage(msg.chat.id, 'Welcome to CinemasBot', {
+  bot.sendMessage(msg.chat.id, startMsg, {
+    parse_mode: 'HTML',
     reply_markup: {
-      inline_keyboard: [[
-        {
-          text: CINEMA + ' Cinema List',
-          callback_data: CINEMA_LIST
-        }
-      ]]
+      inline_keyboard: startKeyboard
     }
   })
 })
+
+function start (msg) {
+  bot.editMessageText(startMsg, {
+    chat_id: msg.chat.id,
+    message_id: msg.message_id,
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: startKeyboard
+    }
+  })
+}
 
 // button calls
 bot.on('callback_query', (callbackQuery) => {
@@ -59,20 +73,29 @@ bot.on('callback_query', (callbackQuery) => {
     case SHOW_TIMES:
       pc.getShowTimes(params[1], params[2], params[3], timesList, msg)
       break
+    case INDEX:
+      start(msg)
   }
 })
 
 // cinema list
 function cinemaList (cinemas, msg) {
   let cinemaBtn = []
+  let btn = {}
   cinemas.forEach(function (cinema) {
-    let btn = {
+    btn = {
       text: cinema.name,
       callback_data: CINEMA_INFO + SEPARATOR + cinema.id
     }
 
     cinemaBtn.push([btn])
   })
+
+  btn = {
+    text: BACK_ARROW + ' Back to home',
+    callback_data: INDEX
+  }
+  cinemaBtn.push([btn])
 
   bot.editMessageText('Cinema Nearby', {
     chat_id: msg.chat.id,
