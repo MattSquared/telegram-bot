@@ -16,9 +16,12 @@ const CLOCK = '🕒'
 const ADDRESS = '🛣'
 const FILM = '🎬'
 const BACK_ARROW = '◀️'
+const REVIEW = '📰'
+const ROUTE = '📍'
 
 // process centric
 const pc = require('./process-centric/process_cinemas.js')
+const pf = require('./process-centric/process_film.js')
 
 // start
 bot.onText(/\/start/, (msg) => {
@@ -51,10 +54,10 @@ bot.on('callback_query', (callbackQuery) => {
       pc.getShowList(params[1], params[2], showList, msg)
       break
     case FILM_INFO:
-      pc.getFilmInfo(params[1], params[2], filmInfo, msg)
+      pf.getFilmInfo(params[1], params[2], params[3], filmInfo, msg)
       break
     case SHOW_TIMES:
-      pc.getTimes(240900)
+      pc.getShowTimes(params[1], params[2], params[3], timesList, msg)
       break
   }
 })
@@ -82,13 +85,10 @@ function cinemaList (cinemas, msg) {
 
 // cinema info
 function cinemaInfo (cinema, msg) {
-  let d = new Date()
-  let date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
-
   let message = '' +
     CINEMA + ' ' + cinema.name + '\n' +
     ADDRESS + ' ' + cinema.address + ', ' + cinema.city + '\n' +
-    '<a href="' + cinema.logo_url + '">&#8205;</a>'
+    '<a href="' + cinema.map_image + '">&#8205;</a>'
 
   bot.editMessageText(message, {
     chat_id: msg.chat.id,
@@ -98,13 +98,19 @@ function cinemaInfo (cinema, msg) {
       inline_keyboard: [
         [
           {
-            text: FILM + ' Shows',
-            callback_data: SHOW_LIST + SEPARATOR + cinema.id + SEPARATOR + date
+            text: ROUTE + ' Route',
+            url: cinema.map_route
           }
         ],
         [
           {
-            text: CINEMA + ' Cinema List',
+            text: FILM + ' Shows',
+            callback_data: SHOW_LIST + SEPARATOR + cinema.id + SEPARATOR + getDate()
+          }
+        ],
+        [
+          {
+            text: BACK_ARROW + ' Back to cinema list',
             callback_data: CINEMA_LIST
           }
         ]
@@ -116,10 +122,11 @@ function cinemaInfo (cinema, msg) {
 // show list
 function showList (films, cinemaId, msg) {
   let filmBtn = []
+  let btn = {}
   films.forEach(function (film) {
-    let btn = {
+    btn = {
       text: film.name,
-      callback_data: FILM_INFO + SEPARATOR + film.id + SEPARATOR + film.imdb_id
+      callback_data: FILM_INFO + SEPARATOR + film.id + SEPARATOR + film.imdb_id + SEPARATOR + cinemaId
     }
 
     filmBtn.push([btn])
@@ -140,12 +147,18 @@ function showList (films, cinemaId, msg) {
   })
 }
 
-// film info TODO
-function filmInfo (film, filmId, msg) {
+// film info
+function filmInfo (film, filmId, imdbId, cinemaId, msg) {
   let message = '' +
-    CINEMA + ' ' + cinema.name + '\n' +
-    ADDRESS + ' ' + cinema.address + ', ' + cinema.city + '\n' +
-    '<a href="' + cinema.logo_url + '">&#8205;</a>'
+    '<b>Title:</b> ' + film.title + '\n' +
+    '<b>Year:</b> ' + film.year + '\n' +
+    '<b>Time:</b> ' + film.runtime + '\n' +
+    '<b>Genre:</b> ' + film.genre + '\n' +
+    '<b>Director:</b> ' + film.director + '\n' +
+    '<b>Actors:</b> ' + film.actors + '\n' +
+    '<b>Plot:</b> ' + film.plot + '\n' +
+    '<b>Rating:</b> ' + film.imdbRating + '\n' +
+    '<a href="' + film.poster + '">&#8205;</a>'
 
   bot.editMessageText(message, {
     chat_id: msg.chat.id,
@@ -155,19 +168,68 @@ function filmInfo (film, filmId, msg) {
       inline_keyboard: [
         [
           {
-            text: CLOCK + ' Show Time',
-            callback_data: SHOW_TIME + SEPARATOR + cinema.id + SEPARATOR + date
+            text: REVIEW + ' Review',
+            url: film.review
           }
         ],
         [
           {
-            text: FILM + ' Films',
-            callback_data: FILM_LIST + SEPARATOR + cinema.id + SEPARATOR + date
+            text: CLOCK + ' Show Times',
+            callback_data: SHOW_TIMES + SEPARATOR + filmId + SEPARATOR + cinemaId + SEPARATOR + imdbId
+          }
+        ],
+        [
+          {
+            text: BACK_ARROW + ' Back to shows',
+            callback_data: SHOW_LIST + SEPARATOR + cinemaId + SEPARATOR + getDate()
           }
         ]
       ]
     }
   })
+}
+
+function timesList (times, filmId, cinemaId, imdbId, msg) {
+  let message = '' +
+    '<b>' + times.name.toUpperCase() + '</b>\n\n' +
+    '<b>Showings Type:</b>\n' +
+    '<i>Standard</i>\n'
+
+  times.showings.standard.forEach(function (item) {
+    message += item + '\n'
+  })
+  message += '\n<i>3D</i>\n'
+  times.showings['3D'].forEach(function (item) {
+    message += item + '\n'
+  })
+
+  message += '\n<b>Days:</b>\n'
+  times.show_dates.forEach(function (item) {
+    message += item + '\n'
+  })
+
+  bot.editMessageText(message, {
+    chat_id: msg.chat.id,
+    message_id: msg.message_id,
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: BACK_ARROW + ' Back to movie',
+            callback_data: FILM_INFO + SEPARATOR + filmId + SEPARATOR + imdbId + SEPARATOR + cinemaId
+          }
+        ]
+      ]
+    }
+  })
+}
+
+function getDate () {
+  let d = new Date()
+  let date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
+
+  return date
 }
 // remove keyboard
 /*

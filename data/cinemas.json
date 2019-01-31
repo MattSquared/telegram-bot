@@ -5,45 +5,40 @@
       "name": "Vue Cinemas - Birkenhead",
       "address": "Conway Park",
       "city": "Birkenhead",
-      "lat": 53.392899,
-      "lng": -3.02392,
-      "logo_url": "https://d2z9fe5yu2p0av.cloudfront.net/chainlogos/uk/UK-712-sq.jpg"
+      "map_image": "https://www.mapquestapi.com/staticmap/v5/map?start=51.4875838,-0.144211&end=51.5011033,-0.1054004&size=600,400@2x&key=nqJeCXuGBBRyQValMllij9dh5QozJ0oX",
+      "map_route": "https://graphhopper.com/maps/?point=51.4875838,-0.144211&point=51.5011033,-0.1054004&locale=en-US&vehicle=car&weighting=fastest&elevation=true&use_miles=false&layer=Omniscale"
 		},
 		{
 			"id": 11760,
       "name": "ODEON Liverpool ONE",
       "address": "14 Paradise Street",
       "city": "Liverpool",
-      "lat": 53.404099,
-      "lng": -2.98664,
-      "logo_url": "https://d2z9fe5yu2p0av.cloudfront.net/chainlogos/uk/UK-614-sq.jpg"
+      "map_image": "https://www.mapquestapi.com/staticmap/v5/map?start=51.4875838,-0.144211&end=51.5011033,-0.1054004&size=600,400@2x&key=nqJeCXuGBBRyQValMllij9dh5QozJ0oX",
+      "map_route": "https://graphhopper.com/maps/?point=51.4875838,-0.144211&point=51.5011033,-0.1054004&locale=en-US&vehicle=car&weighting=fastest&elevation=true&use_miles=false&layer=Omniscale"
 		},
 		{
 			"id": 48607,
       "name": "Everyman Liverpool",
       "address": "35 Whitechapel",
       "city": "Liverpool",
-      "lat": 53.40675,
-      "lng": -2.98512,
-      "logo_url": "https://d2z9fe5yu2p0av.cloudfront.net/chainlogos/uk/UK-1077-sq.jpg"
+      "map_image": "https://www.mapquestapi.com/staticmap/v5/map?start=51.4875838,-0.144211&end=51.5011033,-0.1054004&size=600,400@2x&key=nqJeCXuGBBRyQValMllij9dh5QozJ0oX",
+      "map_route": "https://graphhopper.com/maps/?point=51.4875838,-0.144211&point=51.5011033,-0.1054004&locale=en-US&vehicle=car&weighting=fastest&elevation=true&use_miles=false&layer=Omniscale"
 		},
 		{
 			"id": 9437,
       "name": "FACT Picturehouse",
       "address": "88 Wood Street",
       "city": "Liverpool",
-      "lat": 53.402229,
-      "lng": -2.97757,
-      "logo_url": "https://d2z9fe5yu2p0av.cloudfront.net/chainlogos/uk/UK-1100-sq.jpg"
+      "map_image": "https://www.mapquestapi.com/staticmap/v5/map?start=51.4875838,-0.144211&end=51.5011033,-0.1054004&size=600,400@2x&key=nqJeCXuGBBRyQValMllij9dh5QozJ0oX",
+      "map_route": "https://graphhopper.com/maps/?point=51.4875838,-0.144211&point=51.5011033,-0.1054004&locale=en-US&vehicle=car&weighting=fastest&elevation=true&use_miles=false&layer=Omniscale"
 		},
 		{
       "id": 28447,
       "name": "The Light Cinema New Brighton",
       "address": "Marine Point",
       "city": "New Brighton",
-      "lat": 53.44043,
-      "lng": -3.04537,
-      "logo_url": "https://d2z9fe5yu2p0av.cloudfront.net/chainlogos/uk/UK-1251-sq.jpg"
+      "map_image": "https://www.mapquestapi.com/staticmap/v5/map?start=51.4875838,-0.144211&end=51.5011033,-0.1054004&size=600,400@2x&key=nqJeCXuGBBRyQValMllij9dh5QozJ0oX",
+      "map_route": "https://graphhopper.com/maps/?point=51.4875838,-0.144211&point=51.5011033,-0.1054004&locale=en-US&vehicle=car&weighting=fastest&elevation=true&use_miles=false&layer=Omniscale"
     }
 	]
 }
