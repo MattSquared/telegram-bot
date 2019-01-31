@@ -25,7 +25,7 @@ const pc = require('./process-centric/process_cinemas.js')
 const pf = require('./process-centric/process_film.js')
 
 // start
-const startMsg = '<b>Welcome to CinemasBot</b>\nClick on the button below to get coords and search the cinema nearby'
+const startMsg = '<b>Welcome to CinemasBot</b>\nClick on the button below to search the cinema nearby'
 const startKeyboard = [[{
   text: CINEMA + ' Cinema List',
   callback_data: CINEMA_LIST
