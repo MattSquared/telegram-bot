@@ -10,6 +10,8 @@ const SHOW_LIST = '2'
 const FILM_INFO = '3'
 const SHOW_TIMES = '4'
 const INDEX = '5'
+const SHOW_MAIL = '6'
+const SHOWS_MAIL = '7'
 
 // emoji
 const CINEMA = '🏤'
@@ -19,10 +21,14 @@ const FILM = '🎬'
 const BACK_ARROW = '◀️'
 const REVIEW = '📰'
 const ROUTE = '📍'
+const MAIL = '📧'
 
 // process centric
 const pc = require('./process-centric/process_cinemas.js')
 const pf = require('./process-centric/process_film.js')
+
+// dict for users mail address
+global.mail = {}
 
 // start
 const startMsg = '<b>Welcome to CinemasBot</b>\nClick on the button below to search the cinema nearby'
@@ -75,6 +81,10 @@ bot.on('callback_query', (callbackQuery) => {
       break
     case INDEX:
       start(msg)
+    case SHOW_MAIL:
+      pf.sendShowTimes(params[1], params[2], sendMail, msg)
+    case SHOWS_MAIL:
+      pf.sendShowsTimes(params[1], params[2], sendMail, msg)
   }
 })
 
@@ -156,6 +166,12 @@ function showList (films, cinemaId, msg) {
   })
 
   btn = {
+    text: MAIL + ' Send shows times to email',
+    callback_data: SHOWS_MAIL + SEPARATOR + cinemaId + SEPARATOR + getDate()
+  }
+  filmBtn.push([btn])
+
+  btn = {
     text: BACK_ARROW + ' Back to cinema',
     callback_data: CINEMA_INFO + SEPARATOR + cinemaId
   }
@@ -221,10 +237,13 @@ function timesList (times, filmId, cinemaId, imdbId, msg) {
   times.showings.standard.forEach(function (item) {
     message += item + '\n'
   })
-  message += '\n<i>3D</i>\n'
-  times.showings['3D'].forEach(function (item) {
-    message += item + '\n'
-  })
+
+  if (times.showings['3D'] !== undefined) {
+    message += '\n<i>3D</i>\n'
+    times.showings['3D'].forEach(function (item) {
+      message += item + '\n'
+    })
+  }
 
   message += '\n<b>Days:</b>\n'
   times.show_dates.forEach(function (item) {
@@ -239,6 +258,12 @@ function timesList (times, filmId, cinemaId, imdbId, msg) {
       inline_keyboard: [
         [
           {
+            text: MAIL + ' Send movie showings to email',
+            callback_data: SHOW_MAIL + SEPARATOR + filmId + SEPARATOR + cinemaId
+          }
+        ],
+        [
+          {
             text: BACK_ARROW + ' Back to movie',
             callback_data: FILM_INFO + SEPARATOR + filmId + SEPARATOR + imdbId + SEPARATOR + cinemaId
           }
@@ -248,12 +273,37 @@ function timesList (times, filmId, cinemaId, imdbId, msg) {
   })
 }
 
+function sendMail (status, msg) {
+  if (status) {
+    bot.sendMessage(msg.chat.id, 'Mail sent successfully!').then((msg) => {
+      deleteMsg(msg, 5000)
+    })
+  } else {
+    bot.sendMessage(msg.chat.id, 'Mail is not already registered, please type /mail <mail>, then retry').then((msg) => {
+      deleteMsg(msg, 10000)
+    })
+  }
+}
+
+bot.onText(/\/mail (.+)/, (msg, match) => {
+  mail[msg.chat.username] = match[1]
+  bot.sendMessage(msg.chat.id, 'Mail ' + mail[msg.chat.username] + ' added successfully!').then((msg) => {
+    deleteMsg(msg, 5000)
+  })
+})
+
 function getDate () {
   let d = new Date()
   let date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
 
   return date
 }
+
+function deleteMsg (msg, timeout) {
+  setTimeout(function () {
+    bot.deleteMessage(msg.chat.id, msg.message_id)
+  }, timeout)
+} 
 // remove keyboard
 /*
 function removeKeyboard(msg) {
