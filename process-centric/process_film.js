@@ -2,7 +2,6 @@ const axios = require('axios')
 const f = require('./func')
 
 const MOVIE_BL = 'https://movie-business-logic.herokuapp.com/'
-// const MOVIE_BL = 'http://localhost:5555/'
 const CINEMA_BL = 'https://cinema-business.herokuapp.com/'
 
 exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg) {
@@ -21,25 +20,18 @@ exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg) {
 exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, msg) {
   let username = msg.chat.username
 
-  axios.get(CINEMA_BL + 'cinema', { // get cinema info
-    headers: {
-      position: f.getCoords()
-    },
-    params: {
-      cinema_id: cinemaId
-    }
-  }).then(function (response) {
-    let cinema = response.data
+  if (checkMail(username)) {
+    getCinemaInfo(cinemaId, function (response) {
+      let cinema = response.data
 
-    axios.get(CINEMA_BL + 'showtimes', { // get show times
-      params: {
-        film_id: filmId,
-        cinema_id: cinema.cinema_id
-      }
-    }).then(function (response) {
-      let times = response.data
-      
-      if (checkMail(username)) { // check if mail per user already exist
+      axios.get(CINEMA_BL + 'showtimes', { // get show times
+        params: {
+          film_id: filmId,
+          cinema_id: cinema.cinema_id
+        }
+      }).then(function (response) {
+        let times = response.data
+        
         let body = {
           cinema: cinema,
           times: times
@@ -54,41 +46,33 @@ exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, m
         }).catch(function (error) {
           console.log(error)
         })
-      } else {
-        callback(false, callbackQueryId)
-      }
-    }).catch(function (error) {
-      console.log(error)
+      }).catch(function (error) {
+        console.log(error)
+      })
     })
-  }).catch(function (error) {
-    console.log(error)
-  })
+  } else {
+    callback(false, callbackQueryId)
+  }
 }
 
 exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, msg) {
   let username = msg.chat.username
 
-  axios.get(CINEMA_BL + 'cinema', { // get cinema info
-    headers: {
-      position: f.getCoords()
-    },
-    params: {
-      cinema_id: cinemaId
-    }
-  }).then(function (response) {
-    let cinema = response.data
+  if (checkMail(username)) {
+    getCinemaInfo(cinemaId, function (response) {
+      console.log(response.data)
+      let cinema = response.data
 
-    axios.get(CINEMA_BL + 'detailedShowings', { // get shows per cinema
-      headers: {
-        position: f.getCoords(),
-        datetime: f.getDateTime()
-      },
-      params: {
-        cinema_id: cinema.cinema_id,
-        date: date
-      }
-    }).then(function (response) {
-      if (checkMail(username)) { // check if mail per user already exist
+      axios.get(CINEMA_BL + 'detailedShowings', { // get shows per cinema
+        headers: {
+          position: f.getCoords(),
+          datetime: f.getDateTime()
+        },
+        params: {
+          cinema_id: cinema.cinema_id,
+          date: date
+        }
+      }).then(function (response) {
         let body = {
           cinema: cinema,
           shows: response.data.films
@@ -103,15 +87,13 @@ exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, ms
         }).catch(function (error) {
           console.log(error)
         })
-      } else {
-        callback(false, callbackQueryId)
-      }
-    }).catch(function (error) {
-      console.log(error)
+      }).catch(function (error) {
+        console.log(error)
+      })
     })
-  }).catch(function (error) {
-    console.log(error)
-  })
+  } else {
+    callback(false, callbackQueryId)
+  }
 }
 
 function checkMail (username) {
@@ -120,4 +102,19 @@ function checkMail (username) {
   } else {
     return false
   }
+}
+
+function getCinemaInfo (cinemaId, callback) {
+  axios.get(CINEMA_BL + 'cinema', {
+    headers: {
+      position: f.getCoords()
+    },
+    params: {
+      cinema_id: cinemaId
+    }
+  }).then(function (response) {
+    callback(response)
+  }).catch(function (error) {
+    console.log(error)
+  })
 }
