@@ -82,9 +82,9 @@ bot.on('callback_query', (callbackQuery) => {
     case INDEX:
       start(msg)
     case SHOW_MAIL:
-      pf.sendShowTimes(params[1], params[2], sendMail, msg)
+      pf.sendShowTimes(params[1], params[2], callbackQuery.id, sendMail, msg)
     case SHOWS_MAIL:
-      pf.sendShowsTimes(params[1], params[2], sendMail, msg)
+      pf.sendShowsTimes(params[1], params[2], callbackQuery.id, sendMail, msg)
   }
 })
 
@@ -94,8 +94,8 @@ function cinemaList (cinemas, msg) {
   let btn = {}
   cinemas.forEach(function (cinema) {
     btn = {
-      text: cinema.name,
-      callback_data: CINEMA_INFO + SEPARATOR + cinema.id
+      text: cinema.cinema_name,
+      callback_data: CINEMA_INFO + SEPARATOR + cinema.cinema_id
     }
 
     cinemaBtn.push([btn])
@@ -119,7 +119,7 @@ function cinemaList (cinemas, msg) {
 // cinema info
 function cinemaInfo (cinema, msg) {
   let message = '' +
-    CINEMA + ' ' + cinema.name + '\n' +
+    CINEMA + ' ' + cinema.cinema_name + '\n' +
     ADDRESS + ' ' + cinema.address + ', ' + cinema.city + '\n' +
     '<a href="' + cinema.map_image + '">&#8205;</a>'
 
@@ -138,7 +138,7 @@ function cinemaInfo (cinema, msg) {
         [
           {
             text: FILM + ' Shows',
-            callback_data: SHOW_LIST + SEPARATOR + cinema.id + SEPARATOR + getDate()
+            callback_data: SHOW_LIST + SEPARATOR + cinema.cinema_id + SEPARATOR + getDate()
           }
         ],
         [
@@ -158,8 +158,8 @@ function showList (films, cinemaId, msg) {
   let btn = {}
   films.forEach(function (film) {
     btn = {
-      text: film.name,
-      callback_data: FILM_INFO + SEPARATOR + film.id + SEPARATOR + film.imdb_id + SEPARATOR + cinemaId
+      text: film.film_name,
+      callback_data: FILM_INFO + SEPARATOR + film.film_id + SEPARATOR + film.imdb_id + SEPARATOR + cinemaId
     }
 
     filmBtn.push([btn])
@@ -230,7 +230,7 @@ function filmInfo (film, filmId, imdbId, cinemaId, msg) {
 
 function timesList (times, filmId, cinemaId, imdbId, msg) {
   let message = '' +
-    '<b>' + times.name.toUpperCase() + '</b>\n\n' +
+    '<b>' + times.film_name.toUpperCase() + '</b>\n\n' +
     '<b>Showings Type:</b>\n' +
     '<i>Standard</i>\n'
 
@@ -273,37 +273,37 @@ function timesList (times, filmId, cinemaId, imdbId, msg) {
   })
 }
 
-function sendMail (status, msg) {
+function sendMail (status, callbackQueryId) {
   if (status) {
-    bot.sendMessage(msg.chat.id, 'Mail sent successfully!').then((msg) => {
-      deleteMsg(msg, 5000)
+    bot.answerCallbackQuery(callbackQueryId, {
+      text: 'Mail sent successfully!',
+      show_alert: true
     })
   } else {
-    bot.sendMessage(msg.chat.id, 'Mail is not already registered, please type /mail <mail>, then retry').then((msg) => {
-      deleteMsg(msg, 10000)
+    bot.answerCallbackQuery(callbackQueryId, {
+      text: 'Mail is not already registered, please type /mail <mail>, then retry',
+      show_alert: true
     })
   }
 }
 
 bot.onText(/\/mail (.+)/, (msg, match) => {
   mail[msg.chat.username] = match[1]
-  bot.sendMessage(msg.chat.id, 'Mail ' + mail[msg.chat.username] + ' added successfully!').then((msg) => {
+  bot.sendMessage(msg.chat.id, 'Mail ' + mail[msg.chat.username] + ' added successfully!')/* .then((msg) => {
     deleteMsg(msg, 5000)
-  })
+  }) */
 })
 
 function getDate () {
   let d = new Date()
-  let date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
-
-  return date
+  return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2)
 }
 
-function deleteMsg (msg, timeout) {
+/* function deleteMsg (msg, timeout) {
   setTimeout(function () {
     bot.deleteMessage(msg.chat.id, msg.message_id)
   }, timeout)
-} 
+} */
 // remove keyboard
 /*
 function removeKeyboard(msg) {
