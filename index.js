@@ -22,6 +22,11 @@ const BACK_ARROW = '◀️'
 const REVIEW = '📰'
 const ROUTE = '📍'
 const MAIL = '📧'
+const PHONE = '☎️'
+const SITE = '🖥'
+const FACEBOOK = '💙'
+const INSTAGRAM = '❤️'
+const TWITTER = '💜'
 
 // process centric
 const pc = require('./process-centric/process_cinemas.js')
@@ -121,7 +126,24 @@ function cinemaInfo (cinema, msg) {
   let message = '' +
     CINEMA + ' ' + cinema.cinema_name + '\n' +
     ADDRESS + ' ' + cinema.address + ', ' + cinema.city + '\n' +
-    '<a href="' + cinema.map_image + '">&#8205;</a>'
+    PHONE + ' ' + setNa(cinema.contact.formattedPhone) + '\n' +
+    '<a href="' + cinema.map_image + '">&#8205;</a>' +
+    SITE + ' ' + setNa(cinema.url) + '\n'
+
+  let faceUser = cinema.contact.facebookUsername
+  if (faceUser !== 'null') {
+    message += FACEBOOK + ' <a href="https://www.facebook.com/' + faceUser + '">Facebook</a>\n'
+  }
+
+  let instaUser = cinema.contact.instagram
+  if (instaUser !== 'null') {
+    message += INSTAGRAM + ' <a href="https://www.instagram.com/' + instaUser + '">Instagram</a>\n'
+  }
+
+  let twitterUser = cinema.contact.twitter
+  if (twitterUser !== 'null') {
+    message += TWITTER + ' <a href="https://twitter.com/' + twitterUser + '">Twitter</a>\n'
+  }
 
   bot.editMessageText(message, {
     chat_id: msg.chat.id,
@@ -297,6 +319,10 @@ bot.onText(/\/mail (.+)/, (msg, match) => {
 function getDate () {
   let d = new Date()
   return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2)
+}
+
+function setNa (str) {
+  return str === 'null' ? 'N/A' : str
 }
 
 /* function deleteMsg (msg, timeout) {
