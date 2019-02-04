@@ -1,10 +1,9 @@
 const axios = require('axios')
-const MOVIE_BL = 'https://movie-business-logic.herokuapp.com/'
-// const TEST_URL = 'http://localhost:5555/'
+const f = require('./func')
 
-const cinemasList = require('../data/cinemas.json')
-const showTimeList = require('../data/times.json')
-const responseList = require('../data/response.json')
+const MOVIE_BL = 'https://movie-business-logic.herokuapp.com/'
+// const MOVIE_BL = 'http://localhost:5555/'
+const CINEMA_BL = 'https://cinema-business.herokuapp.com/'
 
 exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg) {
   axios.get(MOVIE_BL + 'getMovieInfo', {
@@ -19,72 +18,100 @@ exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg) {
   })
 }
 
-exports.sendShowTimes = function (filmId, cinemaId, callback, msg) {
-  // params: id_film, id_cinema
+exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, msg) {
   let username = msg.chat.username
 
-  let times = {}
-  showTimeList.films.forEach(function (item) {
-    if (item.id === parseInt(filmId)) {
-      times = item
+  axios.get(CINEMA_BL + 'cinema', { // get cinema info
+    headers: {
+      position: f.getCoords()
+    },
+    params: {
+      cinema_id: cinemaId
     }
-  })
+  }).then(function (response) {
+    let cinema = response.data
 
-  let cinema = {}
-  cinemasList.cinemas.forEach(function (item) {
-    if (item.id === parseInt(cinemaId)) {
-      cinema = item
-    }
-  })
-
-  if (checkMail(username)) {
-    let body = {
-      cinema: cinema,
-      times: times
-    }
-
-    axios.post(TEST_URL + 'sendShowTimes', {
-      user: username,
-      mail: mail[username],
-      body: body
+    axios.get(CINEMA_BL + 'showtimes', { // get show times
+      params: {
+        film_id: filmId,
+        cinema_id: cinema.cinema_id
+      }
     }).then(function (response) {
-      callback(true, msg)
+      let times = response.data
+      
+      if (checkMail(username)) { // check if mail per user already exist
+        let body = {
+          cinema: cinema,
+          times: times
+        }
+
+        axios.post(MOVIE_BL + 'sendShowTimes', { // send data to BL
+          user: username,
+          mail: mail[username],
+          body: body
+        }).then(function (response) {
+          callback(true, callbackQueryId)
+        }).catch(function (error) {
+          console.log(error)
+        })
+      } else {
+        callback(false, callbackQueryId)
+      }
     }).catch(function (error) {
-      console.log(error.status)
+      console.log(error)
     })
-  } else {
-    callback(false, msg)
-  }
+  }).catch(function (error) {
+    console.log(error)
+  })
 }
 
-exports.sendShowsTimes = function (cinemaId, date, callback, msg) {
+exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, msg) {
   let username = msg.chat.username
 
-  let cinema = {}
-  cinemasList.cinemas.forEach(function (item) {
-    if (item.id === parseInt(cinemaId)) {
-      cinema = item
+  axios.get(CINEMA_BL + 'cinema', { // get cinema info
+    headers: {
+      position: f.getCoords()
+    },
+    params: {
+      cinema_id: cinemaId
     }
-  })
+  }).then(function (response) {
+    let cinema = response.data
 
-  if (checkMail(username)) {
-    let body = {
-      cinema: cinema,
-      shows: responseList.films
-    }
-
-    axios.post(MOVIE_BL + 'sendShowsTimes', {
-      user: username,
-      mail: mail[username],
-      body: body
+    axios.get(CINEMA_BL + 'detailedShowings', { // get shows per cinema
+      headers: {
+        position: f.getCoords(),
+        datetime: f.getDateTime()
+      },
+      params: {
+        cinema_id: cinema.cinema_id,
+        date: date
+      }
     }).then(function (response) {
-      callback(true, msg)
+      if (checkMail(username)) { // check if mail per user already exist
+        let body = {
+          cinema: cinema,
+          shows: response.data.films
+        }
+
+        axios.post(MOVIE_BL + 'sendShowsTimes', { // send data to BL
+          user: username,
+          mail: mail[username],
+          body: body
+        }).then(function (response) {
+          callback(true, callbackQueryId)
+        }).catch(function (error) {
+          console.log(error)
+        })
+      } else {
+        callback(false, callbackQueryId)
+      }
     }).catch(function (error) {
-      console.log(error.status)
+      console.log(error)
     })
-  } else {
-    callback(false, msg)
-  }
+  }).catch(function (error) {
+    console.log(error)
+  })
 }
 
 function checkMail (username) {

@@ -1,55 +1,67 @@
-const cinemasList = require('../data/cinemas.json')
-const showTimeList = require('../data/times.json')
+const axios = require('axios')
+const f = require('./func')
+const showTimeList = require('../data/times')
 
-// fake coords
-const coords = {
-  lat: 53.4101422,
-  lng: -3.0240445
-}
+const CINEMA_BL = 'https://cinema-business.herokuapp.com/'
 
 exports.getCinemaList = function (callback, msg) {
-  // header: str(lat,lng)
-  cinemas = cinemasList.cinemas
-  
-  callback(cinemas, msg)
+  axios.get(CINEMA_BL + 'nearby', {
+    headers: {
+      position: f.getCoords(), 
+      datetime: f.getDateTime()
+    }
+  }).then(function (response) {
+    let cinemas = response.data.cinemas
+    callback(cinemas, msg)
+  }).catch(function (error) {
+    console.log(error)
+  })
 }
 
 exports.getCinemaInfo = function (cinemaId, callback, msg) {
-  // params: id_cinema
-  // header: str(lat,lng)
-  let cinema = {}
-  cinemasList.cinemas.forEach(function (item) {
-  	if (item.id === parseInt(cinemaId)) {
-  		cinema = item
-  	}
+  axios.get(CINEMA_BL + 'cinema', {
+    headers: {
+      position: f.getCoords()
+    },
+    params: {
+      cinema_id: cinemaId
+    }
+  }).then(function (response) {
+    let cinema = response.data
+    callback(cinema, msg)
+  }).catch(function (error) {
+    console.log(error)
   })
-
-  callback(cinema, msg)
 }
 
 exports.getShowList = function (cinemaId, date, callback, msg) {
-	/* id: 8947, date: 2019-01-23 */
-  // params: id_cineam, date
-  // header: str(lat,lng)
-  console.log(cinemaId)
-  console.log(date)
-
-  films = showTimeList.films
-
-  callback(films, cinemaId, msg)
+  axios.get(CINEMA_BL + 'showings', {
+    headers: {
+      position: f.getCoords(),
+      datetime: f.getDateTime()
+    },
+    params: {
+      cinema_id: cinemaId,
+      date: date
+    }
+  }).then(function (response) {
+    let films = response.data.films
+    callback(films, cinemaId, msg)
+  }).catch(function (error) {
+    console.log(error)
+  })
 }
 
 exports.getShowTimes = function (filmId, cinemaId, imdbId, callback, msg) {
-  // params: id_film, id_cinema
-  console.log(filmId)
-  console.log(cinemaId)
-
-  let times = {}
-  showTimeList.films.forEach(function (item) {
-    if (item.id === parseInt(filmId)) {
-      times = item
+  axios.get(CINEMA_BL + 'showtimes', {
+    params: {
+      film_id: filmId,
+      cinema_id: cinemaId
     }
+  }).then(function (response) {
+    let times = response.data
+    callback(times, filmId, cinemaId, imdbId, msg)
+  }).catch(function (error) {
+    console.log(error)
   })
-
-  callback(times, filmId, cinemaId, imdbId, msg)
 }
