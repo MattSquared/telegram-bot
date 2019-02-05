@@ -9,9 +9,8 @@ const CINEMA_INFO = '1'
 const SHOW_LIST = '2'
 const FILM_INFO = '3'
 const SHOW_TIMES = '4'
-const INDEX = '5'
-const SHOW_MAIL = '6'
-const SHOWS_MAIL = '7'
+const SHOW_MAIL = '5'
+const SHOWS_MAIL = '6'
 
 // emoji
 const CINEMA = '🏤'
@@ -32,66 +31,96 @@ const TWITTER = '💜'
 const pc = require('./process-centric/process_cinemas.js')
 const pf = require('./process-centric/process_film.js')
 
-// dict for users mail address
+// global dicts using as caches
 global.mail = {}
+global.usersLocation = {}
 
-// start
-const startMsg = '<b>Welcome to CinemasBot</b>\nClick on the button below to search the cinema nearby'
-const startKeyboard = [[{
-  text: CINEMA + ' Cinema List',
-  callback_data: CINEMA_LIST
-}]]
-
+// start bot
 bot.onText(/\/start/, (msg) => {
   // removeKeyboard(msg)
-  bot.sendMessage(msg.chat.id, startMsg, {
-    parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: startKeyboard
+  let message = '<b>Welcome to CinemasBot</b>\nClick on the button below to register your location'
+
+  // added location button
+  let option = {
+    'parse_mode': 'HTML',
+    'reply_markup': {
+      'one_time_keyboard': true,
+      'keyboard': [[{
+        text: ROUTE + ' Register your location',
+        request_location: true
+      }]]
     }
+  }
+  bot.sendMessage(msg.chat.id, message, option).then(() => {
+    bot.on('location', (msg) => {
+      bot.sendMessage(msg.chat.id, '<b>Coords registered</b>\nIf you want update your location click again on the button', {
+        parse_mode: 'HTML'
+      }).then(() => {
+        // register user coords
+        usersLocation[msg.chat.username] = [msg.location.latitude, msg.location.longitude].join(';')
+        start(msg)
+      })
+    })
   })
 })
 
-function start (msg) {
-  bot.editMessageText(startMsg, {
-    chat_id: msg.chat.id,
-    message_id: msg.message_id,
-    parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: startKeyboard
-    }
-  })
-}
+// insert mail
+bot.onText(/\/mail (.+)/, (msg, match) => {
+  mail[msg.chat.username] = match[1]
+  bot.sendMessage(msg.chat.id, 'Mail ' + mail[msg.chat.username] + ' added successfully!')
+})
 
 // button calls
 bot.on('callback_query', (callbackQuery) => {
   let msg = callbackQuery.message
-  let params = callbackQuery.data.split(SEPARATOR)
 
-  switch (params[0]) {
-    case CINEMA_LIST:
-      pc.getCinemaList(cinemaList, msg)
-      break
-    case CINEMA_INFO:
-      pc.getCinemaInfo(params[1], cinemaInfo, msg)
-      break
-    case SHOW_LIST:
-      pc.getShowList(params[1], params[2], showList, msg)
-      break
-    case FILM_INFO:
-      pf.getFilmInfo(params[1], params[2], params[3], filmInfo, msg)
-      break
-    case SHOW_TIMES:
-      pc.getShowTimes(params[1], params[2], params[3], timesList, msg)
-      break
-    case INDEX:
-      start(msg)
-    case SHOW_MAIL:
-      pf.sendShowTimes(params[1], params[2], callbackQuery.id, sendMail, msg)
-    case SHOWS_MAIL:
-      pf.sendShowsTimes(params[1], params[2], callbackQuery.id, sendMail, msg)
+  if (usersLocation[msg.chat.username] !== undefined) { // before do any action, check if user location is already registered
+    let params = callbackQuery.data.split(SEPARATOR)
+
+    switch (params[0]) {
+      case CINEMA_LIST:
+        pc.getCinemaList(cinemaList, msg)
+        break
+      case CINEMA_INFO:
+        pc.getCinemaInfo(params[1], cinemaInfo, msg)
+        break
+      case SHOW_LIST:
+        pc.getShowList(params[1], params[2], showList, msg)
+        break
+      case FILM_INFO:
+        pf.getFilmInfo(params[1], params[2], params[3], filmInfo, msg)
+        break
+      case SHOW_TIMES:
+        pc.getShowTimes(params[1], params[2], params[3], timesList, msg)
+        break
+      case SHOW_MAIL:
+        pf.sendShowTimes(params[1], params[2], callbackQuery.id, sendMail, msg)
+        break
+      case SHOWS_MAIL:
+        pf.sendShowsTimes(params[1], params[2], callbackQuery.id, sendMail, msg)
+        break
+    }
+  } else {
+    bot.answerCallbackQuery(callbackQuery.id, {
+      text: 'Please register your coords before do any action',
+      show_alert: true
+    })
   }
 })
+
+// first button action
+function start (msg) {
+  // message is sended after coords are insterted
+  bot.sendMessage(msg.chat.id, 'Click on the button below to search the cinema nearby you', {
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [[{
+        text: CINEMA + ' Cinema List',
+        callback_data: CINEMA_LIST
+      }]]
+    }
+  })
+}
 
 // cinema list
 function cinemaList (cinemas, msg) {
@@ -106,15 +135,10 @@ function cinemaList (cinemas, msg) {
     cinemaBtn.push([btn])
   })
 
-  btn = {
-    text: BACK_ARROW + ' Back to home',
-    callback_data: INDEX
-  }
-  cinemaBtn.push([btn])
-
-  bot.editMessageText('Cinema Nearby', {
+  bot.editMessageText('<b>Cinema Nearby</b>', {
     chat_id: msg.chat.id,
     message_id: msg.message_id,
+    parse_mode: 'HTML',
     reply_markup: {
       inline_keyboard: cinemaBtn
     }
@@ -124,11 +148,19 @@ function cinemaList (cinemas, msg) {
 // cinema info
 function cinemaInfo (cinema, msg) {
   let message = '' +
+    '<a href="' + cinema.map_image + '">&#8205;</a>' + // empty char (bot shows the preview only of the FIRST link that it find)
     CINEMA + ' ' + cinema.cinema_name + '\n' +
-    ADDRESS + ' ' + cinema.address + ', ' + cinema.city + '\n' +
-    PHONE + ' ' + setNa(cinema.contact.formattedPhone) + '\n' +
-    '<a href="' + cinema.map_image + '">&#8205;</a>' +
-    SITE + ' ' + setNa(cinema.url) + '\n'
+    ADDRESS + ' ' + cinema.address + ', ' + cinema.city + '\n'
+
+  let phone = cinema.contact.formattedPhone
+  if (phone !== 'null') {
+    message += PHONE + ' ' + cinema.contact.formattedPhone + '\n'
+  }
+
+  let site = cinema.url
+  if (site !== 'null') {
+    message += SITE + ' ' + cinema.url + '\n'
+  }
 
   let faceUser = cinema.contact.facebookUsername
   if (faceUser !== 'null') {
@@ -144,6 +176,11 @@ function cinemaInfo (cinema, msg) {
   if (twitterUser !== 'null') {
     message += TWITTER + ' <a href="https://twitter.com/' + twitterUser + '">Twitter</a>\n'
   }
+
+  /* message += '\nHours:\n'
+  cinema.hours.forEach(function (hour) {
+    message += hour + '\n'
+  }) */
 
   bot.editMessageText(message, {
     chat_id: msg.chat.id,
@@ -199,9 +236,10 @@ function showList (films, cinemaId, msg) {
   }
   filmBtn.push([btn])
 
-  bot.editMessageText('Shows', {
+  bot.editMessageText('<b>Shows</b>', {
     chat_id: msg.chat.id,
     message_id: msg.message_id,
+    parse_mode: 'HTML',
     reply_markup: {
       inline_keyboard: filmBtn
     }
@@ -256,7 +294,7 @@ function timesList (times, filmId, cinemaId, imdbId, msg) {
     '<b>Showings Type:</b>\n' +
     '<i>Standard</i>\n'
 
-  times.showings.standard.forEach(function (item) {
+  times.showings.Standard.forEach(function (item) {
     message += item + '\n'
   })
 
@@ -295,6 +333,7 @@ function timesList (times, filmId, cinemaId, imdbId, msg) {
   })
 }
 
+// send mail status alert
 function sendMail (status, callbackQueryId) {
   if (status) {
     bot.answerCallbackQuery(callbackQueryId, {
@@ -309,21 +348,12 @@ function sendMail (status, callbackQueryId) {
   }
 }
 
-bot.onText(/\/mail (.+)/, (msg, match) => {
-  mail[msg.chat.username] = match[1]
-  bot.sendMessage(msg.chat.id, 'Mail ' + mail[msg.chat.username] + ' added successfully!')/* .then((msg) => {
-    deleteMsg(msg, 5000)
-  }) */
-})
-
 function getDate () {
   let d = new Date()
   return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2)
 }
 
-function setNa (str) {
-  return str === 'null' ? 'N/A' : str
-}
+// utility programming bot information and function
 
 /* function deleteMsg (msg, timeout) {
   setTimeout(function () {
@@ -331,13 +361,32 @@ function setNa (str) {
   }, timeout)
 } */
 // remove keyboard
-/*
-function removeKeyboard(msg) {
+
+/* function removeKeyboard(msg) {
   bot.sendMessage(msg.chat.id, 'clean', { reply_markup: { remove_keyboard: true } })
-}
-*/
+} */
 
 // editMessageReplayMarkup modificare tastiera
 
 // passo i vari parametri come oggetto
-// bot.editMessageText("Partita eliminata", {chat_id:chat_id, message_id:message_id, reply_markup:{}})
+// bot.editMessageText('Partita eliminata', {chat_id:chat_id, message_id:message_id, reply_markup:{}})
+
+/* bot.onText(/^\/getCoords/, function (msg, match) {
+  var option = {
+    'parse_mode': 'Markdown',
+    'reply_markup': {
+      'one_time_keyboard': true,
+      'keyboard': [[{
+          text: ROUTE + ' My location',
+          request_location: true
+      }]]
+    }
+  }
+  bot.sendMessage(msg.chat.id, 'Click on the button above to register your location', option).then(() => {
+    bot.on('location', (msg) => {
+      bot.sendMessage(msg.chat.id, 'Coords registered').then(() => {
+        usersLocation[msg.chat.username] = [msg.location.latitude, msg.location.longitude].join(';')
+      })
+    })
+  })
+}) */

@@ -9,6 +9,8 @@ exports.getDateTime = function () {
   return d.toISOString()
 }
 
-exports.getCoords = function () {
+exports.getCoords = function (username) {
+	console.log(usersLocation[username])
+	// return usersLocation[username]
   return coords.lat + ';' + coords.lng
 }

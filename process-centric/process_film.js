@@ -2,6 +2,7 @@ const axios = require('axios')
 const f = require('./func')
 
 const MOVIE_BL = 'https://movie-business-logic.herokuapp.com/'
+// const MOVIE_BL = 'http//localhost:5555/'
 const CINEMA_BL = 'https://cinema-business.herokuapp.com/'
 
 exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg) {
@@ -21,15 +22,16 @@ exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, m
   let username = msg.chat.username
 
   if (checkMail(username)) {
-    getCinemaInfo(cinemaId, function (response) {
+    getCinemaInfo(cinemaId, username, function (response) {
       let cinema = response.data
 
-      axios.get(CINEMA_BL + 'showtimes', { // get show times
+      axios.get('http://localhost/cinemasBot/business_showtimes.json')
+      /*axios.get(CINEMA_BL + 'showtimes', { // get show times
         params: {
           film_id: filmId,
           cinema_id: cinema.cinema_id
         }
-      }).then(function (response) {
+      })*/.then(function (response) {
         let times = response.data
         
         let body = {
@@ -59,20 +61,20 @@ exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, ms
   let username = msg.chat.username
 
   if (checkMail(username)) {
-    getCinemaInfo(cinemaId, function (response) {
-      console.log(response.data)
+    getCinemaInfo(cinemaId, username, function (response) {
       let cinema = response.data
 
-      axios.get(CINEMA_BL + 'detailedShowings', { // get shows per cinema
+      axios.get('http://localhost/cinemasBot/business_detailed.json')
+      /*axios.get(CINEMA_BL + 'detailedShowings', { // get shows per cinema
         headers: {
-          position: f.getCoords(),
+          position: f.getCoords(username),
           datetime: f.getDateTime()
         },
         params: {
           cinema_id: cinema.cinema_id,
           date: date
         }
-      }).then(function (response) {
+      })*/.then(function (response) {
         let body = {
           cinema: cinema,
           shows: response.data.films
@@ -104,15 +106,16 @@ function checkMail (username) {
   }
 }
 
-function getCinemaInfo (cinemaId, callback) {
-  axios.get(CINEMA_BL + 'cinema', {
+function getCinemaInfo (cinemaId, username, callback) {
+  axios.get('http://localhost/cinemasBot/business_cinema.json')
+  /*axios.get(CINEMA_BL + 'cinema', {
     headers: {
-      position: f.getCoords()
+      position: f.getCoords(username)
     },
     params: {
       cinema_id: cinemaId
     }
-  }).then(function (response) {
+  })*/.then(function (response) {
     callback(response)
   }).catch(function (error) {
     console.log(error)
