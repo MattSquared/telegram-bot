@@ -11,8 +11,8 @@ exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg) {
       id: imdbId
     }
   }).then(function (response) {
-  	let film = response.data
-  	callback(film, filmId, imdbId, cinemaId, msg)
+    let film = response.data
+    callback(film, filmId, imdbId, cinemaId, msg)
   }).catch(function (error) {
     console.log(error)
   })
@@ -25,15 +25,14 @@ exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, m
     getCinemaInfo(cinemaId, username, function (response) {
       let cinema = response.data
 
-      axios.get('http://localhost/cinemasBot/business_showtimes.json')
-      /*axios.get(CINEMA_BL + 'showtimes', { // get show times
+      // axios.get('http://localhost/cinemasBot/business_showtimes.json')
+      axios.get(CINEMA_BL + 'showtimes', { // get show times
         params: {
           film_id: filmId,
           cinema_id: cinema.cinema_id
         }
-      })*/.then(function (response) {
+      }).then(function (response) {
         let times = response.data
-        
         let body = {
           cinema: cinema,
           times: times
@@ -64,8 +63,8 @@ exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, ms
     getCinemaInfo(cinemaId, username, function (response) {
       let cinema = response.data
 
-      axios.get('http://localhost/cinemasBot/business_detailed.json')
-      /*axios.get(CINEMA_BL + 'detailedShowings', { // get shows per cinema
+      // axios.get('http://localhost/cinemasBot/business_detailed.json')
+      axios.get(CINEMA_BL + 'detailedShowings', { // get shows per cinema
         headers: {
           position: f.getCoords(username),
           datetime: f.getDateTime()
@@ -74,7 +73,7 @@ exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, ms
           cinema_id: cinema.cinema_id,
           date: date
         }
-      })*/.then(function (response) {
+      }).then(function (response) {
         let body = {
           cinema: cinema,
           shows: response.data.films
@@ -107,15 +106,15 @@ function checkMail (username) {
 }
 
 function getCinemaInfo (cinemaId, username, callback) {
-  axios.get('http://localhost/cinemasBot/business_cinema.json')
-  /*axios.get(CINEMA_BL + 'cinema', {
+  // axios.get('http://localhost/cinemasBot/business_cinema.json')
+  axios.get(CINEMA_BL + 'cinema', {
     headers: {
       position: f.getCoords(username)
     },
     params: {
       cinema_id: cinemaId
     }
-  })*/.then(function (response) {
+  }).then(function (response) {
     callback(response)
   }).catch(function (error) {
     console.log(error)
