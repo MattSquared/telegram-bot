@@ -38,7 +38,8 @@ global.usersLocation = {}
 // start bot
 bot.onText(/\/start/, (msg) => {
   // removeKeyboard(msg)
-  let message = '<b>Welcome to CinemasBot</b>\nClick on the button below to register your location'
+  let message = '<b>Welcome to CinemasBot</b>\nClick on the button below to register your location ' +
+    'or use <i>/setCoords &lt;latitude&gt ; &lt;longitude&gt</i> if using desktop version'
 
   // added location button
   let option = {
@@ -53,7 +54,7 @@ bot.onText(/\/start/, (msg) => {
   }
   bot.sendMessage(msg.chat.id, message, option).then(() => {
     bot.on('location', (msg) => {
-      bot.sendMessage(msg.chat.id, '<b>Coords registered</b>\nIf you want update your location click again on the button', {
+      bot.sendMessage(msg.chat.id, '<b>Coords registered</b>\nIf you want update your location click again on the button or use /setCoords', {
         parse_mode: 'HTML'
       }).then(() => {
         // register user coords
@@ -67,7 +68,23 @@ bot.onText(/\/start/, (msg) => {
 // insert mail
 bot.onText(/\/mail (.+)/, (msg, match) => {
   mail[msg.chat.username] = match[1]
-  bot.sendMessage(msg.chat.id, 'Mail ' + mail[msg.chat.username] + ' added successfully!')
+  bot.sendMessage(msg.chat.id, ' ' + mail[msg.chat.username] + ' added successfully!')
+})
+
+// insert coords manually for desktop version
+bot.onText(/\/setCoords (.+)/, (msg, match) => {
+  if (match[1].includes(';')) {
+    usersLocation[msg.chat.username] = match[1]
+    bot.sendMessage(msg.chat.id, '<b>Coords registered</b>\nIf you want update your location click again on the button or use /setCoords', {
+      parse_mode: 'HTML'
+    }).then(() => {
+      start(msg)
+    })
+  } else {
+    bot.sendMessage(msg.chat.id, 'Syntax error\nCorrect syntax: <i>/setCoords &lt;latitude&gt ; &lt;longitude&gt</i>', {
+      parse_mode: 'HTML'
+    })
+  }
 })
 
 // button calls

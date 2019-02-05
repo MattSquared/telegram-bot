@@ -4,7 +4,7 @@ const f = require('./func')
 const CINEMA_BL = 'https://cinema-business.herokuapp.com/'
 
 exports.getCinemaList = function (callback, msg) {
-  // axios.get('http://localhost/cinemasBot/business_nearby.json')
+  // axios.get('http://localhost/cinemasBot/business_nearby.json', {
   axios.get(CINEMA_BL + 'nearby', {
     headers: {
       position: f.getCoords(msg.chat.username),
