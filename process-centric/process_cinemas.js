@@ -3,7 +3,7 @@ const f = require('./func')
 
 const CINEMA_BL = 'https://cinema-business.herokuapp.com/'
 
-exports.getCinemaList = function (callback, msg) {
+exports.getCinemaList = function (callback, msg, errorMsg, callbackQueryId) {
   // axios.get('http://localhost/cinemasBot/business_nearby.json', {
   axios.get(CINEMA_BL + 'nearby', {
     headers: {
@@ -14,11 +14,12 @@ exports.getCinemaList = function (callback, msg) {
     let cinemas = response.data.cinemas
     callback(cinemas, msg)
   }).catch(function (error) {
+    errorMsg(callbackQueryId)
     console.log(error)
   })
 }
 
-exports.getCinemaInfo = function (cinemaId, callback, msg) {
+exports.getCinemaInfo = function (cinemaId, callback, msg, errorMsg, callbackQueryId) {
   // axios.get('http://localhost/cinemasBot/business_cinema.json')
   axios.get(CINEMA_BL + 'cinema', {
     headers: {
@@ -31,11 +32,12 @@ exports.getCinemaInfo = function (cinemaId, callback, msg) {
     let cinema = response.data
     callback(cinema, msg)
   }).catch(function (error) {
+    errorMsg(callbackQueryId)
     console.log(error)
   })
 }
 
-exports.getShowList = function (cinemaId, date, callback, msg) {
+exports.getShowList = function (cinemaId, date, callback, msg, errorMsg, callbackQueryId) {
   // axios.get('http://localhost/cinemasBot/business_showings.json')
   axios.get(CINEMA_BL + 'showings', {
     headers: {
@@ -50,11 +52,12 @@ exports.getShowList = function (cinemaId, date, callback, msg) {
     let films = response.data.films
     callback(films, cinemaId, msg)
   }).catch(function (error) {
+    errorMsg(callbackQueryId)
     console.log(error)
   })
 }
 
-exports.getShowTimes = function (filmId, cinemaId, imdbId, callback, msg) {
+exports.getShowTimes = function (filmId, cinemaId, imdbId, callback, msg, errorMsg, callbackQueryId) {
   // axios.get('http://localhost/cinemasBot/business_showtimes.json')
   axios.get(CINEMA_BL + 'showtimes', {
     params: {
@@ -65,6 +68,7 @@ exports.getShowTimes = function (filmId, cinemaId, imdbId, callback, msg) {
     let times = response.data
     callback(times, filmId, cinemaId, imdbId, msg)
   }).catch(function (error) {
+    errorMsg(callbackQueryId)
     console.log(error)
   })
 }

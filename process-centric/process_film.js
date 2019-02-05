@@ -5,7 +5,7 @@ const MOVIE_BL = 'https://movie-business-logic.herokuapp.com/'
 // const MOVIE_BL = 'http//localhost:5555/'
 const CINEMA_BL = 'https://cinema-business.herokuapp.com/'
 
-exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg) {
+exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg, errorMsg, callbackQueryId) {
   axios.get(MOVIE_BL + 'getMovieInfo', {
     params: {
       id: imdbId
@@ -14,15 +14,16 @@ exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg) {
     let film = response.data
     callback(film, filmId, imdbId, cinemaId, msg)
   }).catch(function (error) {
+    errorMsg(callbackQueryId)
     console.log(error)
   })
 }
 
-exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, msg) {
+exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, msg, errorMsg, callbackQueryId) {
   let username = msg.chat.username
 
   if (checkMail(username)) {
-    getCinemaInfo(cinemaId, username, function (response) {
+    getCinemaInfo(cinemaId, username, errorMsg, callbackQueryId, function (response) {
       let cinema = response.data
 
       // axios.get('http://localhost/cinemasBot/business_showtimes.json')
@@ -45,9 +46,11 @@ exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, m
         }).then(function (response) {
           callback(true, callbackQueryId)
         }).catch(function (error) {
+          errorMsg(callbackQueryId)
           console.log(error)
         })
       }).catch(function (error) {
+        errorMsg(callbackQueryId)
         console.log(error)
       })
     })
@@ -56,11 +59,11 @@ exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, m
   }
 }
 
-exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, msg) {
+exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, msg, errorMsg, callbackQueryId) {
   let username = msg.chat.username
 
   if (checkMail(username)) {
-    getCinemaInfo(cinemaId, username, function (response) {
+    getCinemaInfo(cinemaId, username, errorMsg, callbackQueryId, function (response) {
       let cinema = response.data
 
       // axios.get('http://localhost/cinemasBot/business_detailed.json')
@@ -86,9 +89,11 @@ exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, ms
         }).then(function (response) {
           callback(true, callbackQueryId)
         }).catch(function (error) {
+          errorMsg(callbackQueryId)
           console.log(error)
         })
       }).catch(function (error) {
+        errorMsg(callbackQueryId)
         console.log(error)
       })
     })
@@ -105,7 +110,7 @@ function checkMail (username) {
   }
 }
 
-function getCinemaInfo (cinemaId, username, callback) {
+function getCinemaInfo (cinemaId, username, callback, errorMsg, callbackQueryId) {
   // axios.get('http://localhost/cinemasBot/business_cinema.json')
   axios.get(CINEMA_BL + 'cinema', {
     headers: {
@@ -117,6 +122,7 @@ function getCinemaInfo (cinemaId, username, callback) {
   }).then(function (response) {
     callback(response)
   }).catch(function (error) {
+    errorMsg(callbackQueryId)
     console.log(error)
   })
 }

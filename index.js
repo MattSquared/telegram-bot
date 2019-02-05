@@ -96,25 +96,25 @@ bot.on('callback_query', (callbackQuery) => {
 
     switch (params[0]) {
       case CINEMA_LIST:
-        pc.getCinemaList(cinemaList, msg)
+        pc.getCinemaList(cinemaList, msg, errorMsg, callbackQuery.id)
         break
       case CINEMA_INFO:
-        pc.getCinemaInfo(params[1], cinemaInfo, msg)
+        pc.getCinemaInfo(params[1], cinemaInfo, msg, errorMsg, callbackQuery.id)
         break
       case SHOW_LIST:
-        pc.getShowList(params[1], params[2], showList, msg)
+        pc.getShowList(params[1], params[2], showList, msg, errorMsg, callbackQuery.id)
         break
       case FILM_INFO:
-        pf.getFilmInfo(params[1], params[2], params[3], filmInfo, msg)
+        pf.getFilmInfo(params[1], params[2], params[3], filmInfo, msg, errorMsg, callbackQuery.id)
         break
       case SHOW_TIMES:
-        pc.getShowTimes(params[1], params[2], params[3], timesList, msg)
+        pc.getShowTimes(params[1], params[2], params[3], timesList, msg, errorMsg, callbackQuery.id)
         break
       case SHOW_MAIL:
-        pf.sendShowTimes(params[1], params[2], callbackQuery.id, sendMail, msg)
+        pf.sendShowTimes(params[1], params[2], callbackQuery.id, sendMail, msg, errorMsg, callbackQuery.id)
         break
       case SHOWS_MAIL:
-        pf.sendShowsTimes(params[1], params[2], callbackQuery.id, sendMail, msg)
+        pf.sendShowsTimes(params[1], params[2], callbackQuery.id, sendMail, msg, errorMsg, callbackQuery.id)
         break
     }
   } else {
@@ -194,10 +194,12 @@ function cinemaInfo (cinema, msg) {
     message += TWITTER + ' <a href="https://twitter.com/' + twitterUser + '">Twitter</a>\n'
   }
 
-  /* message += '\nHours:\n'
-  cinema.hours.forEach(function (hour) {
-    message += hour + '\n'
-  }) */
+  if (cinema.hours !== 'null') {
+    message += '\nHours:\n'
+    cinema.hours.forEach(function (hour) {
+      message += hour + '\n'
+    })
+  }
 
   bot.editMessageText(message, {
     chat_id: msg.chat.id,
@@ -363,6 +365,13 @@ function sendMail (status, callbackQueryId) {
       show_alert: true
     })
   }
+}
+
+function errorMsg(callbackQueryId) {
+  bot.answerCallbackQuery(callbackQueryId, {
+    text: 'Something was wrong, please try again!',
+    show_alert: true
+  })
 }
 
 function getDate () {
