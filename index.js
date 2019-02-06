@@ -111,10 +111,10 @@ bot.on('callback_query', (callbackQuery) => {
         pc.getShowTimes(params[1], params[2], params[3], timesList, msg, errorMsg, callbackQuery.id)
         break
       case SHOW_MAIL:
-        pf.sendShowTimes(params[1], params[2], callbackQuery.id, sendMail, msg, errorMsg, callbackQuery.id)
+        pf.sendShowTimes(params[1], params[2], callbackQuery.id, sendMail, msg, errorMsg)
         break
       case SHOWS_MAIL:
-        pf.sendShowsTimes(params[1], params[2], callbackQuery.id, sendMail, msg, errorMsg, callbackQuery.id)
+        pf.sendShowsTimes(params[1], params[2], callbackQuery.id, sendMail, msg, errorMsg)
         break
     }
   } else {
