@@ -329,7 +329,7 @@ function timesList (times, filmId, cinemaId, imdbId, msg) {
     })
   }
 
-  message += '\n<b>Days:</b>\n'
+  message += '\n<b>Show times are valid for the following days:</b>\n'
   times.show_dates.forEach(function (item) {
     message += item + '\n'
   })
