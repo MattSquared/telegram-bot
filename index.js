@@ -169,32 +169,34 @@ function cinemaInfo (cinema, msg) {
     CINEMA + ' ' + cinema.cinema_name + '\n' +
     ADDRESS + ' ' + cinema.address + ', ' + cinema.city + '\n'
 
-  let phone = cinema.contact.formattedPhone
-  if (phone !== 'null') {
-    message += PHONE + ' ' + cinema.contact.formattedPhone + '\n'
-  }
-
   let site = cinema.url
-  if (site !== 'null') {
-    message += SITE + ' ' + cinema.url + '\n'
+  if (site !== null) {
+    message += SITE + ' ' + site + '\n'
   }
 
-  let faceUser = cinema.contact.facebookUsername
-  if (faceUser !== 'null') {
-    message += FACEBOOK + ' <a href="https://www.facebook.com/' + faceUser + '">Facebook</a>\n'
+  if (cinema.contact !== null) {
+    let phone = cinema.contact.phone
+    if (phone !== null) {
+      message += PHONE + ' ' + phone + '\n'
+    }
+
+    let faceUser = cinema.contact.facebook
+    if (faceUser !== null) {
+      message += FACEBOOK + ' <a href="https://www.facebook.com/' + faceUser + '">Facebook</a>\n'
+    }
+
+    let instaUser = cinema.contact.instagram
+    if (instaUser !== null) {
+      message += INSTAGRAM + ' <a href="https://www.instagram.com/' + instaUser + '">Instagram</a>\n'
+    }
+
+    let twitterUser = cinema.contact.twitter
+    if (twitterUser !== null) {
+      message += TWITTER + ' <a href="https://twitter.com/' + twitterUser + '">Twitter</a>\n'
+    }
   }
 
-  let instaUser = cinema.contact.instagram
-  if (instaUser !== 'null') {
-    message += INSTAGRAM + ' <a href="https://www.instagram.com/' + instaUser + '">Instagram</a>\n'
-  }
-
-  let twitterUser = cinema.contact.twitter
-  if (twitterUser !== 'null') {
-    message += TWITTER + ' <a href="https://twitter.com/' + twitterUser + '">Twitter</a>\n'
-  }
-
-  if (cinema.hours !== 'null') {
+  if (cinema.hours !== null) {
     message += '\nHours:\n'
     cinema.hours.forEach(function (hour) {
       message += hour + '\n'
@@ -307,19 +309,22 @@ function filmInfo (film, filmId, imdbId, cinemaId, msg) {
   })
 }
 
+// single movie times list
 function timesList (times, filmId, cinemaId, imdbId, msg) {
   let message = '' +
     '<b>' + times.film_name.toUpperCase() + '</b>\n\n' +
-    '<b>Showings Type:</b>\n' +
-    '<i>Standard</i>\n'
+    '<b>Showings Type:</b>\n'
 
-  times.showings.Standard.forEach(function (item) {
-    message += item + '\n'
-  })
+  if (times.showings.standard !== undefined) {
+    message += '\n<i>Standard</i>\n'
+    times.showings.standard.forEach(function (item) {
+      message += item + '\n'
+    })
+  }
 
-  if (times.showings['3D'] !== undefined) {
+  if (times.showings['3d'] !== undefined) {
     message += '\n<i>3D</i>\n'
-    times.showings['3D'].forEach(function (item) {
+    times.showings['3d'].forEach(function (item) {
       message += item + '\n'
     })
   }
