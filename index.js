@@ -7,7 +7,7 @@ app.use(bodyParser.json())
 const TelegramBot = require('node-telegram-bot-api')
 const token = require('./token').token
 
-const bot = {}
+var bot = {}
 if (process.env.NODE_ENV === 'production') {
   bot = new TelegramBot(token);
   bot.setWebHook('https://cinemas-bot.herokuapp.com/' + bot.token);
