@@ -19,5 +19,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "node-telegram-bot-api": "^0.30.0"
+  },
+  "engines": {
+    "node": "10.x"
   }
 }

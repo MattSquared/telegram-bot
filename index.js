@@ -59,6 +59,7 @@ bot.onText(/\/start/, (msg) => {
       }).then(() => {
         // register user coords
         usersLocation[msg.chat.username] = [msg.location.latitude, msg.location.longitude].join(';')
+        usersFakeLocation[msg.chat.username] = undefined // clean fake coords
         start(msg)
       })
     })
@@ -75,6 +76,7 @@ bot.onText(/\/mail (.+)/, (msg, match) => {
 bot.onText(/\/setCoords (.+)/, (msg, match) => {
   if (match[1].includes(';')) {
     usersLocation[msg.chat.username] = match[1]
+    usersFakeLocation[msg.chat.username] = undefined // clean fake coords
     bot.sendMessage(msg.chat.id, '<b>Coords registered</b>\nIf you want update your location click again on the button or use /setCoords', {
       parse_mode: 'HTML'
     }).then(() => {
@@ -175,6 +177,7 @@ function cinemaList (cinemas, msg) {
  * @param {Message} msg - Telegram Message object
  */
 function cinemaInfo (cinema, msg) {
+  console.log(cinema)
   let message = '' +
     '<a href="' + cinema.map_image + '">&#8205;</a>' + // empty char (bot shows the preview only of the FIRST link that it find)
     CINEMA + ' ' + cinema.cinema_name + '\n' +
