@@ -1,24 +1,16 @@
-const express = require('express')
-const app = express()
-const PORT = process.env.PORT || 5795
-const bodyParser = require('body-parser')
-app.use(bodyParser.json())
-
 const TelegramBot = require('node-telegram-bot-api')
-const token = require('./token').token
 
+var token = ''
 var bot = {}
 if (process.env.NODE_ENV === 'production') {
-  bot = new TelegramBot(token);
-  bot.setWebHook('https://cinemas-bot.herokuapp.com/' + bot.token);
+  token = process.env.TOKEN
+  bot = new TelegramBot(token)
+  bot.setWebHook(process.env.HEROKU_URL + bot.token, { allowed_updates:['callback_query'] })
+  require('./web')(bot)
 } else {
-  bot = new TelegramBot(token, { polling: true });
+  token = require('./token').token
+  bot = new TelegramBot(token, { polling: true })
 }
-
-app.post('/' + token, function (req, res) {
-  bot.processUpdate(req.body)
-  res.sendStatus(200)
-})
 
 // function
 const SEPARATOR = '§'
