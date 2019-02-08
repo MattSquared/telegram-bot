@@ -27,7 +27,7 @@ const FACEBOOK = '💙'
 const INSTAGRAM = '❤️'
 const TWITTER = '💜'
 
-// process centric
+// import process centric
 const pc = require('./process-centric/process_cinemas.js')
 const pf = require('./process-centric/process_film.js')
 
@@ -59,6 +59,7 @@ bot.onText(/\/start/, (msg) => {
       }).then(() => {
         // register user coords
         usersLocation[msg.chat.username] = [msg.location.latitude, msg.location.longitude].join(';')
+        usersFakeLocation[msg.chat.username] = undefined // clean fake coords
         start(msg)
       })
     })
@@ -75,6 +76,7 @@ bot.onText(/\/mail (.+)/, (msg, match) => {
 bot.onText(/\/setCoords (.+)/, (msg, match) => {
   if (match[1].includes(';')) {
     usersLocation[msg.chat.username] = match[1]
+    usersFakeLocation[msg.chat.username] = undefined // clean fake coords
     bot.sendMessage(msg.chat.id, '<b>Coords registered</b>\nIf you want update your location click again on the button or use /setCoords', {
       parse_mode: 'HTML'
     }).then(() => {
@@ -87,7 +89,7 @@ bot.onText(/\/setCoords (.+)/, (msg, match) => {
   }
 })
 
-// button calls
+// button listener
 bot.on('callback_query', (callbackQuery) => {
   let msg = callbackQuery.message
 
@@ -111,21 +113,24 @@ bot.on('callback_query', (callbackQuery) => {
         pc.getShowTimes(params[1], params[2], params[3], timesList, msg, errorMsg, callbackQuery.id)
         break
       case SHOW_MAIL:
-        pf.sendShowTimes(params[1], params[2], callbackQuery.id, sendMail, msg, errorMsg)
+        pf.sendShowTimes(params[1], params[2], sendMail, msg, errorMsg, callbackQuery.id)
         break
       case SHOWS_MAIL:
-        pf.sendShowsTimes(params[1], params[2], callbackQuery.id, sendMail, msg, errorMsg)
+        pf.sendShowsTimes(params[1], params[2], sendMail, msg, errorMsg, callbackQuery.id)
         break
     }
   } else {
-    bot.answerCallbackQuery(callbackQuery.id, {
+    bot.answerCallbackQuery(callbackQuery.id, { // raise an exception if coords are not already registered
       text: 'Please register your coords before do any action',
       show_alert: true
     })
   }
 })
 
-// first button action
+/**
+ * Start button action
+ * @param {Message} msg - Telegram Message object
+ */
 function start (msg) {
   // message is sended after coords are insterted
   bot.sendMessage(msg.chat.id, 'Click on the button below to search the cinema nearby you', {
@@ -139,7 +144,11 @@ function start (msg) {
   })
 }
 
-// cinema list
+/**
+ * Cinema list interface
+ * @param {Oboject[]} cinemas - list of cinema
+ * @param {Message} msg - Telegram Message object
+ */
 function cinemaList (cinemas, msg) {
   let cinemaBtn = []
   let btn = {}
@@ -162,8 +171,13 @@ function cinemaList (cinemas, msg) {
   })
 }
 
-// cinema info
+/**
+ * Cinema info interface
+ * @param {Oboject} cinema
+ * @param {Message} msg - Telegram Message object
+ */
 function cinemaInfo (cinema, msg) {
+  console.log(cinema)
   let message = '' +
     '<a href="' + cinema.map_image + '">&#8205;</a>' + // empty char (bot shows the preview only of the FIRST link that it find)
     CINEMA + ' ' + cinema.cinema_name + '\n' +
@@ -232,7 +246,12 @@ function cinemaInfo (cinema, msg) {
   })
 }
 
-// show list
+/**
+ * Showings list for a cinema interface
+ * @param {Oboject[]} films - list of films
+ * @param {int} cinemaId
+ * @param {Message} msg - Telegram Message object
+ */
 function showList (films, cinemaId, msg) {
   let filmBtn = []
   let btn = {}
@@ -267,7 +286,14 @@ function showList (films, cinemaId, msg) {
   })
 }
 
-// film info
+/**
+ * Film information interface
+ * @param {Oboject} film
+ * @param {int} filmId
+ * @param {string} imdbId - movie id takes from http://imdb.com
+ * @param {int} cinemaId
+ * @param {Message} msg - Telegram Message object
+ */
 function filmInfo (film, filmId, imdbId, cinemaId, msg) {
   let message = '' +
     '<b>Title:</b> ' + film.title + '\n' +
@@ -309,7 +335,14 @@ function filmInfo (film, filmId, imdbId, cinemaId, msg) {
   })
 }
 
-// single movie times list
+/**
+ * Movie times list interface
+ * @param {Oboject[]} times
+ * @param {int} filmId
+ * @param {int} cinemaId
+ * @param {string} imdbId - movie id takes from http://imdb.com
+ * @param {Message} msg - Telegram Message object
+ */
 function timesList (times, filmId, cinemaId, imdbId, msg) {
   let message = '' +
     '<b>' + times.film_name.toUpperCase() + '</b>\n\n' +
@@ -357,7 +390,11 @@ function timesList (times, filmId, cinemaId, imdbId, msg) {
   })
 }
 
-// send mail status alert
+/**
+ * Send mail status alert
+ * @param {boolean} status
+ * @param {int} callbackQuery - id of Telegram callbackQuery
+ */
 function sendMail (status, callbackQueryId) {
   if (status) {
     bot.answerCallbackQuery(callbackQueryId, {
@@ -372,6 +409,10 @@ function sendMail (status, callbackQueryId) {
   }
 }
 
+/**
+ * If an error occur display this alert
+ * @param {int} callbackQuery - id of Telegram callbackQuery
+ */
 function errorMsg(callbackQueryId) {
   bot.answerCallbackQuery(callbackQueryId, {
     text: 'Something was wrong, please try again!',
@@ -379,6 +420,9 @@ function errorMsg(callbackQueryId) {
   })
 }
 
+/**
+ * Return date in format YYYY-MM-DD
+ */
 function getDate () {
   let d = new Date()
   return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2)
