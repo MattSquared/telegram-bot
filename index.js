@@ -9,6 +9,7 @@ const token = require('./token').token
 
 var bot = {}
 if (process.env.NODE_ENV === 'production') {
+  console.log('Heroku merda')
   bot = new TelegramBot(token)
   bot.setWebHook('https://cinemas-bot.herokuapp.com/' + bot.token)
 } else {
