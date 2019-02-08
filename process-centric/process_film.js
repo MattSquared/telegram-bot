@@ -2,9 +2,18 @@ const axios = require('axios')
 const f = require('./func')
 
 const MOVIE_BL = 'https://movie-business-logic.herokuapp.com/'
-// const MOVIE_BL = 'http://localhost:5555/'
 const CINEMA_BL = 'https://cinema-business.herokuapp.com/'
 
+/**
+ * Return information of a film by its imdbId
+ * @param {int} filmId
+ * @param {string} imdbId - movie id takes from http://imdb.com
+ * @param {int} cinemaId
+ * @param {fucntion} callback - callback function
+ * @param {Message} msg - Telegram Message object
+ * @param {function} errorMsg - error function
+ * @param {int} callbackQueryId - id of Telegram callbackQuery
+ */
 exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg, errorMsg, callbackQueryId) {
   axios.get(MOVIE_BL + 'movie', {
     params: {
@@ -24,7 +33,16 @@ exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg, errorMs
   })
 }
 
-exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, msg, errorMsg) {
+/**
+ * Send the information of show times of a film to the business logic in order to send a mail with this info
+ * @param {int} filmId
+ * @param {int} cinemaId
+ * @param {fucntion} callback - callback function
+ * @param {Message} msg - Telegram Message object
+ * @param {function} errorMsg - error function
+ * @param {int} callbackQueryId - id of Telegram callbackQuery
+ */
+exports.sendShowTimes = function (filmId, cinemaId, callback, msg, errorMsg, callbackQueryId) {
   let username = msg.chat.username
 
   if (checkMail(username)) {
@@ -68,7 +86,16 @@ exports.sendShowTimes = function (filmId, cinemaId, callbackQueryId, callback, m
   }
 }
 
-exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, msg, errorMsg) {
+/**
+ * Send the information of showings of a cinema to the business logic in order to send a mail with this info
+ * @param {int} cinemaId
+ * @param {string} date - format: YYYY-MM-DD
+ * @param {fucntion} callback - callback function
+ * @param {Message} msg - Telegram Message object
+ * @param {function} errorMsg - error function
+ * @param {int} callbackQueryId - id of Telegram callbackQuery
+ */
+exports.sendShowsTimes = function (cinemaId, date, callback, msg, errorMsg, callbackQueryId) {
   let username = msg.chat.username
 
   if (checkMail(username)) {
@@ -108,7 +135,6 @@ exports.sendShowsTimes = function (cinemaId, date, callbackQueryId, callback, ms
       }).catch(function (error) { // detailedShowings error
         errorMsg(callbackQueryId)
         console.log(error.response.statusText)
-        // console.log(error.response.statusText)
       })
     })
   } else {
@@ -124,6 +150,14 @@ function checkMail (username) {
   }
 }
 
+/**
+ * Return information of a cinema by its id
+ * @param {int} cinemaId
+ * @param {string} username - Telegram username
+ * @param {function} errorMsg - error function
+ * @param {int} callbackQueryId - id of Telegram callbackQuery
+ * @param {fucntion} callback - callback function
+ */
 function getCinemaInfo (cinemaId, username, errorMsg, callbackQueryId, callback) {
   axios.get(CINEMA_BL + 'cinema', {
     headers: {

@@ -16,14 +16,22 @@ const coords = {
 	}
 }
 
+/** 
+ * Return ISO date format
+ */
 exports.getDateTime = function () {
   let d = new Date()
   return d.toISOString()
 }
 
+/** 
+ * Return coords by username
+ * @param {string} username - Telegram username
+ */
 exports.getCoords = function (username) {
   console.log(usersLocation[username])
 
+  // takes random coords from fake coords and save it for the current user
   if (usersFakeLocation[username] === undefined) {
   	let index = randCoords()
   	usersFakeLocation[username] = [coords[index].lat, coords[index].lng].join(';')
