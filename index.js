@@ -1,6 +1,13 @@
 const TelegramBot = require('node-telegram-bot-api')
 const token = require('./token').token
-const bot = new TelegramBot(token, { polling: true })
+
+const bot = {}
+if (process.env.NODE_ENV === 'production') {
+  bot = new TelegramBot(token);
+  bot.setWebHook('https://cinemas-bot.herokuapp.com/' + bot.token);
+} else {
+  bot = new TelegramBot(token, { polling: true });
+}
 
 // function
 const SEPARATOR = '§'

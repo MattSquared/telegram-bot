@@ -33,8 +33,8 @@ exports.getCoords = function (username) {
 
   // takes random coords from fake coords and save it for the current user
   if (usersFakeLocation[username] === undefined) {
-  	// let index = randCoords()
-  	let index = 0
+  	let index = randCoords()
+  	// let index = 0
   	usersFakeLocation[username] = [coords[index].lat, coords[index].lng].join(';')
   }
   return usersFakeLocation[username]
