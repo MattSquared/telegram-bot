@@ -1,5 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api')
 const token = require('./token').token
+const bodyParser = require('body-parser')
+app.use(bodyParser.json())
 
 const bot = {}
 if (process.env.NODE_ENV === 'production') {
@@ -8,6 +10,11 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   bot = new TelegramBot(token, { polling: true });
 }
+
+app.post('/' + token, function (req, res) {
+  bot.processUpdate(req.body)
+  res.sendStatus(200)
+})
 
 // function
 const SEPARATOR = '§'
