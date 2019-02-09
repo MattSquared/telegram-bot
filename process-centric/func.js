@@ -2,17 +2,17 @@ global.usersFakeLocation = {}
 
 // fake coords
 const coords = {
-	0: {
+  0: { // Liverpool
 		lat: 53.4101422,
   	lng: -3.0240445		
 	},
-	1: {
+	1: { // Birmingham
 		lat: 52.477564,
     lng: -2.0037166
 	},
-	2: {
-		lat: 50.913908,
-    lng: -1.4705332
+	2: { // Manchester
+		lat: 53.4818336,
+    lng: -2.2453167
 	}
 }
 
