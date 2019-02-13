@@ -22,5 +22,5 @@ module.exports = function (bot) {
   app.post('/' + bot.token, function (req, res) {
     bot.processUpdate(req.body)
     res.sendStatus(200)
-  });
-};
+  })
+}
