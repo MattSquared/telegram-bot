@@ -47,7 +47,7 @@ global.usersLocation = {}
 
 // start bot
 bot.onText(/\/start/, (msg) => {
-  removeKeyboard(msg)
+  // removeKeyboard(msg)
   let message = '<b>Welcome to CinemasBot</b>\nClick on the button below to register your location ' +
     'or use <i>/setCoords &lt;latitude&gt ; &lt;longitude&gt</i> if using desktop version'
 
@@ -446,9 +446,9 @@ function getDate () {
 } */
 // remove keyboard
 
-function removeKeyboard(msg) {
+/* function removeKeyboard(msg) {
   bot.sendMessage(msg.chat.id, 'clean', { reply_markup: { remove_keyboard: true } })
-}
+} */
 
 // editMessageReplayMarkup modificare tastiera
 
