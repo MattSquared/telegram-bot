@@ -18,7 +18,7 @@ exports.getCinemaList = function (callback, msg, errorMsg, callbackQueryId) {
     }
   }).then(function (response) {
     let cinemas = response.data.cinemas
-    callback(cinemas, msg)
+    callback(cinemas, msg, callbackQueryId)
   }).catch(function (error) { // nearby error
     errorMsg(callbackQueryId)
     console.log(error.response.statusText)
@@ -43,7 +43,7 @@ exports.getCinemaInfo = function (cinemaId, callback, msg, errorMsg, callbackQue
     }
   }).then(function (response) {
     let cinema = response.data
-    callback(cinema, msg)
+    callback(cinema, msg, callbackQueryId)
   }).catch(function (error) { // cinema error
     errorMsg(callbackQueryId)
     console.log(error.response.statusText)
@@ -71,7 +71,7 @@ exports.getShowList = function (cinemaId, date, callback, msg, errorMsg, callbac
     }
   }).then(function (response) {
     let films = response.data.films
-    callback(films, cinemaId, msg)
+    callback(films, cinemaId, msg, callbackQueryId)
   }).catch(function (error) { // showings error
     errorMsg(callbackQueryId)
     console.log(error.response.statusText)
@@ -96,7 +96,7 @@ exports.getShowTimes = function (filmId, cinemaId, imdbId, callback, msg, errorM
     }
   }).then(function (response) {
     let times = response.data.showtimes
-    callback(times, filmId, cinemaId, imdbId, msg)
+    callback(times, filmId, cinemaId, imdbId, msg, callbackQueryId)
   }).catch(function (error) { // showtimes error
     errorMsg(callbackQueryId)
     console.log(error.response.statusText)

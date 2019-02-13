@@ -104,7 +104,6 @@ bot.on('callback_query', (callbackQuery) => {
   let msg = callbackQuery.message
 
   if (usersLocation[msg.chat.username] !== undefined) { // before do any action, check if user location is already registered
-    bot.answerCallbackQuery(callbackQuery.id)
     let params = callbackQuery.data.split(SEPARATOR)
 
     switch (params[0]) {
@@ -160,7 +159,9 @@ function start (msg) {
  * @param {Oboject[]} cinemas - list of cinema
  * @param {Message} msg - Telegram Message object
  */
-function cinemaList (cinemas, msg) {
+function cinemaList (cinemas, msg, cbId) {
+  bot.answerCallbackQuery(cbId)
+
   let cinemaBtn = []
   let btn = {}
   cinemas.forEach(function (cinema) {
@@ -187,8 +188,9 @@ function cinemaList (cinemas, msg) {
  * @param {Oboject} cinema
  * @param {Message} msg - Telegram Message object
  */
-function cinemaInfo (cinema, msg) {
-  console.log(cinema)
+function cinemaInfo (cinema, msg, cbId) {
+  bot.answerCallbackQuery(cbId)
+
   let message = '' +
     '<a href="' + cinema.map_image + '">&#8205;</a>' + // empty char (bot shows the preview only of the FIRST link that it find)
     CINEMA + ' ' + cinema.cinema_name + '\n' +
@@ -263,7 +265,9 @@ function cinemaInfo (cinema, msg) {
  * @param {int} cinemaId
  * @param {Message} msg - Telegram Message object
  */
-function showList (films, cinemaId, msg) {
+function showList (films, cinemaId, msg, cbId) {
+  bot.answerCallbackQuery(cbId)
+
   let filmBtn = []
   let btn = {}
   films.forEach(function (film) {
@@ -305,7 +309,9 @@ function showList (films, cinemaId, msg) {
  * @param {int} cinemaId
  * @param {Message} msg - Telegram Message object
  */
-function filmInfo (film, filmId, imdbId, cinemaId, msg) {
+function filmInfo (film, filmId, imdbId, cinemaId, msg, cbId) {
+  bot.answerCallbackQuery(cbId)
+
   let message = '' +
     '<b>Title:</b> ' + film.title + '\n' +
     '<b>Year:</b> ' + film.year + '\n' +
@@ -354,7 +360,9 @@ function filmInfo (film, filmId, imdbId, cinemaId, msg) {
  * @param {string} imdbId - movie id takes from http://imdb.com
  * @param {Message} msg - Telegram Message object
  */
-function timesList (times, filmId, cinemaId, imdbId, msg) {
+function timesList (times, filmId, cinemaId, imdbId, msg, cbId) {
+  bot.answerCallbackQuery(cbId)
+  
   let message = '' +
     '<b>' + times.film_name.toUpperCase() + '</b>\n\n' +
     '<b>Showings Type:</b>\n'

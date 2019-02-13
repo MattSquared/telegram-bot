@@ -22,7 +22,7 @@ exports.getFilmInfo = function (filmId, imdbId, cinemaId, callback, msg, errorMs
   }).then(function (response) {
     if (response.data.response.status === 200) { // movie success
       let film = response.data.data
-      callback(film, filmId, imdbId, cinemaId, msg)
+      callback(film, filmId, imdbId, cinemaId, msg, callbackQueryId)
     } else { // movie error
       errorMsg(callbackQueryId)
       console.log(response.data.response) 
