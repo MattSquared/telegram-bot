@@ -159,9 +159,7 @@ function start (msg) {
  * @param {Oboject[]} cinemas - list of cinema
  * @param {Message} msg - Telegram Message object
  */
-function cinemaList (cinemas, msg, cbId) {
-  bot.answerCallbackQuery(cbId)
-
+function cinemaList (cinemas, msg) {
   let cinemaBtn = []
   let btn = {}
   cinemas.forEach(function (cinema) {
@@ -188,9 +186,7 @@ function cinemaList (cinemas, msg, cbId) {
  * @param {Oboject} cinema
  * @param {Message} msg - Telegram Message object
  */
-function cinemaInfo (cinema, msg, cbId) {
-  bot.answerCallbackQuery(cbId)
-
+function cinemaInfo (cinema, msg) {
   let message = '' +
     '<a href="' + cinema.map_image + '">&#8205;</a>' + // empty char (bot shows the preview only of the FIRST link that it find)
     CINEMA + ' ' + cinema.cinema_name + '\n' +
@@ -265,9 +261,7 @@ function cinemaInfo (cinema, msg, cbId) {
  * @param {int} cinemaId
  * @param {Message} msg - Telegram Message object
  */
-function showList (films, cinemaId, msg, cbId) {
-  bot.answerCallbackQuery(cbId)
-
+function showList (films, cinemaId, msg) {
   let filmBtn = []
   let btn = {}
   films.forEach(function (film) {
@@ -309,9 +303,7 @@ function showList (films, cinemaId, msg, cbId) {
  * @param {int} cinemaId
  * @param {Message} msg - Telegram Message object
  */
-function filmInfo (film, filmId, imdbId, cinemaId, msg, cbId) {
-  bot.answerCallbackQuery(cbId)
-
+function filmInfo (film, filmId, imdbId, cinemaId, msg) {
   let message = '' +
     '<b>Title:</b> ' + film.title + '\n' +
     '<b>Year:</b> ' + film.year + '\n' +
@@ -360,9 +352,7 @@ function filmInfo (film, filmId, imdbId, cinemaId, msg, cbId) {
  * @param {string} imdbId - movie id takes from http://imdb.com
  * @param {Message} msg - Telegram Message object
  */
-function timesList (times, filmId, cinemaId, imdbId, msg, cbId) {
-  bot.answerCallbackQuery(cbId)
-  
+function timesList (times, filmId, cinemaId, imdbId, msg) {
   let message = '' +
     '<b>' + times.film_name.toUpperCase() + '</b>\n\n' +
     '<b>Showings Type:</b>\n'
