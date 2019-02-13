@@ -104,6 +104,7 @@ bot.on('callback_query', (callbackQuery) => {
   let msg = callbackQuery.message
 
   if (usersLocation[msg.chat.username] !== undefined) { // before do any action, check if user location is already registered
+    bot.answerCallbackQuery(callbackQuery.id)
     let params = callbackQuery.data.split(SEPARATOR)
 
     switch (params[0]) {
